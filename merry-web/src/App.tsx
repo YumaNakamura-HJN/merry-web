@@ -1,34 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import CssBaseline from "@mui/material/CssBaseline";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Layout from "./tsx/views/components/block/Layout";
+import { lazy } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const Top = lazy(() => import("./tsx/views/pages/top/Top"));
+const Users = lazy(() => import("./tsx/views/pages/users/Users"));
+const Items = lazy(() => import("./tsx/views/pages/items/Items"));
 
+const theme = createTheme();
+
+export default function App() {
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Top />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/items" element={<Items />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </Box>
+    </ThemeProvider>
+  );
 }
-
-export default App
