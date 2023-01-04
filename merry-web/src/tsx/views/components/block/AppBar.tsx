@@ -31,7 +31,7 @@ const MyAppBar = styled(MuiAppBar, {
 }));
 
 export const AppBar = ({
-  title = "High Junk Handyman",
+  title = "Merry",
   open,
   toggleDrawer
 }: MyAppBarProps) => {
@@ -56,8 +56,9 @@ export const AppBar = ({
         </IconButton>
         <Typography
           component="h1"
-          variant="h6"
+          variant="h4"
           color="inherit"
+          align='center'
           noWrap
           sx={{ flexGrow: 1 }}
         >
