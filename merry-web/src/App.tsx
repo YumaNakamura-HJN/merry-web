@@ -6,8 +6,7 @@ import Layout from "./tsx/views/components/block/Layout";
 import { lazy } from "react";
 
 const Top = lazy(() => import("./tsx/views/pages/top/Top"));
-const Users = lazy(() => import("./tsx/views/pages/users/Users"));
-const Items = lazy(() => import("./tsx/views/pages/items/Items"));
+const Employees = lazy(() => import("./tsx/views/pages/employees/Employees"));
 
 const theme = createTheme();
 
@@ -20,8 +19,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Top />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/items" element={<Items />} />
+              <Route path="/employees" element={<Employees />} />
             </Route>
           </Routes>
         </BrowserRouter>

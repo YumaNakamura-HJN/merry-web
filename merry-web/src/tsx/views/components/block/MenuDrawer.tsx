@@ -81,17 +81,11 @@ export const MenuDrawer = ({ open, toggleDrawer }: Props) => {
           </ListItemIcon>
           <ListItemText primary="トップページ" />
         </ListItemButton>
-        <ListItemButton to="/users">
+        <ListItemButton to="/employees">
           <ListItemIcon>
             <PeopleIcon />
           </ListItemIcon>
-          <ListItemText primary="ユーザー一覧" />
-        </ListItemButton>
-        <ListItemButton to="/items">
-          <ListItemIcon>
-            <ViewInArIcon />
-          </ListItemIcon>
-          <ListItemText primary="商品一覧" />
+          <ListItemText primary="社員管理" />
         </ListItemButton>
       </List>
     </Drawer>
