@@ -7,9 +7,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import { useEffect, useState } from 'react';
 
 interface Column {
-  id: 'name' | 'code' | 'population' | 'size' | 'density';
+  id: 'id' | 'name' | 'nameKana' | 'employeePosition' | 'sex';
   label: string;
   minWidth?: number;
   align?: 'right';
@@ -17,68 +18,22 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: 'name', label: 'Name', minWidth: 170 },
-  { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
-  {
-    id: 'population',
-    label: 'Population',
-    minWidth: 170,
-    align: 'right',
-    format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'size',
-    label: 'Size\u00a0(km\u00b2)',
-    minWidth: 170,
-    align: 'right',
-    format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'density',
-    label: 'Density',
-    minWidth: 170,
-    align: 'right',
-    format: (value: number) => value.toFixed(2),
-  },
+  { id: 'id', label: 'ID', minWidth: 6 },
+  { id: 'name', label: '名前', minWidth: 170 },
+  { id: 'nameKana', label: '名前 カナ', minWidth: 170 },
+  { id: 'employeePosition', label: '役職', minWidth: 170 },
+  { id: 'sex', label: '性別', minWidth: 170 },
 ];
 
 interface Data {
+  id: number;
   name: string;
-  code: string;
-  population: number;
-  size: number;
-  density: number;
+  nameKana: string;
+  employeePosition: string;
+  sex: string;
 }
 
-function createData(
-  name: string,
-  code: string,
-  population: number,
-  size: number,
-): Data {
-  const density = population / size;
-  return { name, code, population, size, density };
-}
-
-const rows = [
-  createData('India', 'IN', 1324171354, 3287263),
-  createData('China', 'CN', 1403500365, 9596961),
-  createData('Italy', 'IT', 60483973, 301340),
-  createData('United States', 'US', 327167434, 9833520),
-  createData('Canada', 'CA', 37602103, 9984670),
-  createData('Australia', 'AU', 25475400, 7692024),
-  createData('Germany', 'DE', 83019200, 357578),
-  createData('Ireland', 'IE', 4857000, 70273),
-  createData('Mexico', 'MX', 126577691, 1972550),
-  createData('Japan', 'JP', 126317000, 377973),
-  createData('France', 'FR', 67022000, 640679),
-  createData('United Kingdom', 'GB', 67545757, 242495),
-  createData('Russia', 'RU', 146793744, 17098246),
-  createData('Nigeria', 'NG', 200962417, 923768),
-  createData('Brazil', 'BR', 210147125, 8515767),
-];
-
-export default function StickyHeadTable() {
+export default function EmployeesTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -90,6 +45,54 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+  const [employees, setEmployees] = useState([])
+  const rows: { id: string, name: string; nameKana: string; employeePosition: string; sex: string; }[] = [];
+
+  function createRows(
+    json: any,
+  ): void {
+    rows.length = 0;
+    json
+      .forEach(
+        (data: any) =>
+          rows.push(
+            {
+              id: data['id'],
+              name: new String(data['nameLast']).concat(data['nameFirst']),
+              nameKana: new String(data['nameLastKana']).concat(data['nameFirstKana']),
+              employeePosition: data['employeePosition'],
+              sex: data['sex'],
+            }
+          )
+      )
+  }
+
+  function createRow(
+    employee: any,
+  ): Data {
+    return {
+      id: employee['id'],
+      name: new String(employee['nameLast']).concat(employee['nameFirst']),
+      nameKana: new String(employee['nameLastKana']).concat(employee['nameFirstKana']),
+      employeePosition: employee['employeePosition'],
+      sex: employee['sex'],
+    }
+  }
+
+  useEffect(() => {
+    const url = 'http://localhost:8080/employee/find_all';
+    const fetchEmployeesData = async () => {
+      try {
+        const res = await fetch(url, {method: 'GET', mode: 'cors'});
+        const json = await res.json();
+        setEmployees(json);
+      } catch (e) {
+        console.log("error", e);
+      }
+    }
+    fetchEmployeesData();
+  },[])
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -109,18 +112,18 @@ export default function StickyHeadTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
+            {employees &&
+             employees
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
+              .map((employee) => {
+                const row = createRow(employee)
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row['id']}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
+                          {value}
                         </TableCell>
                       );
                     })}
@@ -131,9 +134,9 @@ export default function StickyHeadTable() {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
+        rowsPerPageOptions={[10, 20, 50]}
         component="div"
-        count={rows.length}
+        count={employees.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
